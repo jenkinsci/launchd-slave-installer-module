@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * Inserts {@link LaunchdSlaveInstaller} to every slave.
+ * Inserts {@link LaunchdSlaveInstallerGui} to every slave.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -27,6 +27,6 @@ public class ComputerListenerImpl extends ComputerListener {
         RSAPublicKey key = id.getPublic();
         String instanceId = Util.getDigestOf(new String(Base64.encodeBase64(key.getEncoded()))).substring(0,8);
 
-        c.getChannel().call(new LaunchdSlaveInstaller(instanceId));
+        c.getChannel().call(new LaunchdSlaveInstallerGui(instanceId));
     }
 }

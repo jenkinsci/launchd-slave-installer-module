@@ -32,14 +32,14 @@ import static javax.swing.JOptionPane.*;
  *
  * @author Kohsuke Kawaguchi
  */
-public class LaunchdSlaveInstaller implements Callable<Void,IOException>, ActionListener {
+public class LaunchdSlaveInstallerGui implements Callable<Void,IOException>, ActionListener {
     private final String instanceId;
 
     private transient Engine engine;
     private transient MainDialog dialog;
     private transient File tmpDir;
 
-    public LaunchdSlaveInstaller(String instanceId) {
+    public LaunchdSlaveInstallerGui(String instanceId) {
         this.instanceId = instanceId;
     }
 
@@ -61,7 +61,7 @@ public class LaunchdSlaveInstaller implements Callable<Void,IOException>, Action
                 MainMenu mainMenu = dialog.getMainMenu();
                 JMenu m = mainMenu.getFileMenu();
                 JMenuItem menu = new JMenuItem(Messages.LaunchdSlaveInstaller_DisplayName(), KeyEvent.VK_S);
-                menu.addActionListener(LaunchdSlaveInstaller.this);
+                menu.addActionListener(LaunchdSlaveInstallerGui.this);
                 m.add(menu);
                 mainMenu.commit();
             }
