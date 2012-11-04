@@ -43,7 +43,7 @@ public class LaunchdSlaveInstaller {
         File sudo = copyResourceIntoExecutableFile("cocoasudo");
         File installSh = copyResourceIntoExecutableFile("install.sh");
 
-        File slaveJar = Which.jarFile(Channel.class);
+        File slaveJar = getJarFile();
 
         String plist = IOUtils.toString(getClass().getResourceAsStream("jenkins-slave.plist"));
         plist = plist
@@ -90,6 +90,15 @@ public class LaunchdSlaveInstaller {
             }
         });
         System.exit(0);
+    }
+
+    /**
+     * Decides the jar file to be launched from launchd.
+     *
+     * The file will be copied into another location before getting passed to launchd.
+     */
+    protected File getJarFile() throws IOException {
+        return Which.jarFile(Channel.class);
     }
 
     /**
