@@ -19,6 +19,7 @@ import static javax.swing.JOptionPane.*;
 
 /**
  * Performs the actual slave installation.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class LaunchdSlaveInstaller {
@@ -31,6 +32,12 @@ public class LaunchdSlaveInstaller {
         this.jnlpFileUrl = jnlpFileUrl;
     }
 
+    /**
+     * Because the launchd installation will immediately start a daemon,
+     * this installation will be performed after the main slave process terminates.
+     * Therefore, this method will never return in case of successful completion
+     * (and instead JVM exits.)
+     */
     public void install() throws IOException, InterruptedException {
         tmpDir = File.createTempFile("jenkins", "tmp");
         tmpDir.delete();
@@ -61,7 +68,7 @@ public class LaunchdSlaveInstaller {
                 .add(instanceId);
         final String[] cmds = args.toCommandArray();
 
-        // let the install runstart after we close our connection, to avoid conflicts
+        // let the installation start after we close our connection, to avoid conflicts
         // because this code runs after the channel gets closed, we shouldn't rely on any extra libraries
         Runtime.getRuntime().addShutdownHook(new Thread("service starter") {
             public void run() {
@@ -71,8 +78,7 @@ public class LaunchdSlaveInstaller {
                     consume(p.getInputStream());
                     int r = p.waitFor();
                     if (r!=0) // error, but too late to recover
-                        JOptionPane.showMessageDialog(null, "Failed to install as a service",
-                                Messages.LaunchdSlaveInstaller_DisplayName(), ERROR_MESSAGE);
+                        reportError("Failed to install as a service: " + r);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -87,6 +93,10 @@ public class LaunchdSlaveInstaller {
             }
         });
         System.exit(0);
+    }
+
+    protected void reportError(String msg) {
+        System.err.println("Error: "+msg);
     }
 
     private File copyResourceIntoExecutableFile(String resourceName) throws IOException, InterruptedException {

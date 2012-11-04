@@ -73,7 +73,14 @@ public class LaunchdSlaveInstallerGui implements Callable<Void,IOException>, Act
             if(r!=JOptionPane.OK_OPTION)    return;
 
             new LaunchdSlaveInstaller(instanceId,
-                    new URL(engine.getHudsonUrl(),"computer/"+ Util.rawEncode(engine.slaveName)+"/slave-agent.jnlp")).install();
+                    new URL(engine.getHudsonUrl(),"computer/"+ Util.rawEncode(engine.slaveName)+"/slave-agent.jnlp")) {
+
+                @Override
+                protected void reportError(String msg) {
+                    JOptionPane.showMessageDialog(null, msg,
+                            Messages.LaunchdSlaveInstaller_DisplayName(), ERROR_MESSAGE);
+                }
+            }.install();
 
         } catch (Exception t) {// this runs as a JNLP app, so if we let an exception go, we'll never find out why it failed
             StringWriter sw = new StringWriter();
