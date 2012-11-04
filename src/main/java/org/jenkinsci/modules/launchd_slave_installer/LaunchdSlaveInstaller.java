@@ -9,13 +9,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.jvnet.libpam.impl.CLibrary.passwd;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import static javax.swing.JOptionPane.*;
 
 /**
  * Performs the actual slave installation.
@@ -52,7 +49,7 @@ public class LaunchdSlaveInstaller {
         plist = plist
                 .replace("{username}", getCurrentUnixUserName())
                 .replace("{instanceId}", instanceId)
-                .replace("{url}", jnlpFileUrl.toExternalForm());
+                .replace("{args}", toArgStrings(buildRunnerArguments()));
 
         File plistFile = File.createTempFile("jenkins-slave","plist");
         FileUtils.writeStringToFile(plistFile, plist);
@@ -93,6 +90,23 @@ public class LaunchdSlaveInstaller {
             }
         });
         System.exit(0);
+    }
+
+    /**
+     * Decides the arguments to the jar file that launchd will start.
+     */
+    protected ArgumentListBuilder buildRunnerArguments() {
+        ArgumentListBuilder args = new ArgumentListBuilder();
+        args.add("-jnlpUrl",jnlpFileUrl.toExternalForm());
+        return args;
+    }
+
+    private String toArgStrings(ArgumentListBuilder args) {
+        StringBuilder buf = new StringBuilder();
+        for (String s : args.toList()) {
+            buf.append("      <string>").append(s).append("</string>\n");
+        }
+        return buf.toString();
     }
 
     protected void reportError(String msg) {

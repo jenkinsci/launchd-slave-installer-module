@@ -13,8 +13,7 @@
       <string>/usr/bin/java</string>
       <string>-jar</string>
       <string>/System/Library/LaunchDaemons/org.jenkins-ci.slave.{instanceId}.jar</string>
-      <string>-jnlpUrl</string>
-      <string>{url}</string>
+      {args}
     </array>
 
     <key>RunAtLoad</key>
