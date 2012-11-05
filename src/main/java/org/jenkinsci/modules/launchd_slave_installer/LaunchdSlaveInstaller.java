@@ -1,41 +1,40 @@
 package org.jenkinsci.modules.launchd_slave_installer;
 
 import hudson.FilePath;
-import hudson.remoting.Channel;
-import hudson.remoting.Which;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.jna.GNUCLibrary;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jenkinsci.modules.slave_installer.InstallationException;
+import org.jenkinsci.modules.slave_installer.LaunchConfiguration;
+import org.jenkinsci.modules.slave_installer.SlaveInstaller;
 import org.jvnet.libpam.impl.CLibrary.passwd;
+import org.jvnet.localizer.Localizable;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 /**
  * Performs the actual slave installation.
  *
  * @author Kohsuke Kawaguchi
  */
-public class LaunchdSlaveInstaller {
+public class LaunchdSlaveInstaller extends SlaveInstaller {
     private final String instanceId;
-    private final URL jnlpFileUrl;
     private transient File tmpDir;
 
-    public LaunchdSlaveInstaller(String instanceId, URL jnlpFileUrl) {
+    public LaunchdSlaveInstaller(String instanceId) {
         this.instanceId = instanceId;
-        this.jnlpFileUrl = jnlpFileUrl;
     }
 
-    /**
-     * Because the launchd installation will immediately start a daemon,
-     * this installation will be performed after the main slave process terminates.
-     * Therefore, this method will never return in case of successful completion
-     * (and instead JVM exits.)
-     */
-    public void install() throws IOException, InterruptedException {
+    @Override
+    public Localizable getConfirmationText() {
+        return Messages._LaunchdSlaveInstaller_ConfirmationText();
+    }
+
+    @Override
+    public void install(LaunchConfiguration params) throws InstallationException, IOException, InterruptedException {
         tmpDir = File.createTempFile("jenkins", "tmp");
         tmpDir.delete();
         tmpDir.mkdirs();
@@ -43,13 +42,13 @@ public class LaunchdSlaveInstaller {
         File sudo = copyResourceIntoExecutableFile("cocoasudo");
         File installSh = copyResourceIntoExecutableFile("install.sh");
 
-        File slaveJar = getJarFile();
+        File slaveJar = params.getJarFile();
 
         String plist = IOUtils.toString(getClass().getResourceAsStream("jenkins-slave.plist"));
         plist = plist
                 .replace("{username}", getCurrentUnixUserName())
                 .replace("{instanceId}", instanceId)
-                .replace("{args}", toArgStrings(buildRunnerArguments()));
+                .replace("{args}", toArgStrings(params.buildRunnerArguments()));
 
         File plistFile = File.createTempFile("jenkins-slave","plist");
         FileUtils.writeStringToFile(plistFile, plist);
@@ -90,24 +89,6 @@ public class LaunchdSlaveInstaller {
             }
         });
         System.exit(0);
-    }
-
-    /**
-     * Decides the jar file to be launched from launchd.
-     *
-     * The file will be copied into another location before getting passed to launchd.
-     */
-    protected File getJarFile() throws IOException {
-        return Which.jarFile(Channel.class);
-    }
-
-    /**
-     * Decides the arguments to the jar file that launchd will start.
-     */
-    protected ArgumentListBuilder buildRunnerArguments() {
-        ArgumentListBuilder args = new ArgumentListBuilder();
-        args.add("-jnlpUrl",jnlpFileUrl.toExternalForm());
-        return args;
     }
 
     private String toArgStrings(ArgumentListBuilder args) {
