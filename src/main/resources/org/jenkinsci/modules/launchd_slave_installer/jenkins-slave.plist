@@ -21,5 +21,8 @@
 
     <key>SessionCreate</key>
     <true/>
+
+    <key>KeepAlive</key>
+    <true/>
   </dict>
 </plist>
