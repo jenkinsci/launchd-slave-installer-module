@@ -2,13 +2,12 @@ package org.jenkinsci.modules.launchd_slave_installer;
 
 import hudson.FilePath;
 import hudson.util.ArgumentListBuilder;
-import hudson.util.jna.GNUCLibrary;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jenkinsci.modules.slave_installer.AbstractUnixSlaveInstaller;
 import org.jenkinsci.modules.slave_installer.InstallationException;
 import org.jenkinsci.modules.slave_installer.LaunchConfiguration;
-import org.jenkinsci.modules.slave_installer.SlaveInstaller;
-import org.jvnet.libpam.impl.CLibrary.passwd;
+import org.jenkinsci.modules.slave_installer.Prompter;
 import org.jvnet.localizer.Localizable;
 
 import java.io.File;
@@ -20,7 +19,7 @@ import java.io.InputStream;
  *
  * @author Kohsuke Kawaguchi
  */
-public class LaunchdSlaveInstaller extends SlaveInstaller {
+public class LaunchdSlaveInstaller extends AbstractUnixSlaveInstaller {
     private final String instanceId;
     private transient File tmpDir;
 
@@ -34,7 +33,7 @@ public class LaunchdSlaveInstaller extends SlaveInstaller {
     }
 
     @Override
-    public void install(LaunchConfiguration params) throws InstallationException, IOException, InterruptedException {
+    public void install(LaunchConfiguration params, Prompter prompter) throws InstallationException, IOException, InterruptedException {
         tmpDir = File.createTempFile("jenkins", "tmp");
         tmpDir.delete();
         tmpDir.mkdirs();
@@ -99,19 +98,10 @@ public class LaunchdSlaveInstaller extends SlaveInstaller {
         return buf.toString();
     }
 
-    protected void reportError(String msg) {
-        System.err.println("Error: "+msg);
-    }
-
     private File copyResourceIntoExecutableFile(String resourceName) throws IOException, InterruptedException {
         File f = new File(tmpDir,resourceName);
         FileUtils.copyURLToFile(getClass().getResource(resourceName), f);
         new FilePath(f).chmod(0755);
         return f;
-    }
-
-    private String getCurrentUnixUserName() {
-        passwd pwd = GNUCLibrary.LIBC.getpwuid(GNUCLibrary.LIBC.geteuid());
-        return pwd.pw_name;
     }
 }
