@@ -8,7 +8,7 @@
 
   <groupId>org.jenkins-ci.modules</groupId>
   <artifactId>launchd-slave-installer</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <packaging>jenkins-module</packaging>
   <name>OS X slave installer</name>
   <description>Adds a GUI option to install the JNLP slave agent under launchd</description>
