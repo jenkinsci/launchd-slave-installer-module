@@ -34,7 +34,7 @@ public class SlaveInstallerFactoryImpl extends SlaveInstallerFactory {
 
     private static class Predicate implements Callable<Boolean, RuntimeException> {
         public Boolean call() throws RuntimeException {
-            return new File("/bin/launchctl").exists() || new File("/System/Library/LaunchDaemons").exists();
+            return new File("/bin/launchctl").exists() || new File("/Library/LaunchDaemons").exists();
         }
         private static final long serialVersionUID = 1L;
     }

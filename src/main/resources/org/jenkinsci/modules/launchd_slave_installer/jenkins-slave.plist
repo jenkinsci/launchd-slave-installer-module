@@ -13,7 +13,7 @@
       <string>/usr/bin/java</string>
       <string>-Xdock:name=Jenkins slave</string>
       <string>-jar</string>
-      <string>/System/Library/LaunchDaemons/org.jenkins-ci.slave.{instanceId}.jar</string>
+      <string>/Library/LaunchDaemons/org.jenkins-ci.slave.{instanceId}.jar</string>
       {args}
     </array>
 
