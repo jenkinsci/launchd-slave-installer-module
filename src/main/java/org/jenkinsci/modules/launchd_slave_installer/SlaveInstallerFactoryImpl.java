@@ -3,6 +3,7 @@ package org.jenkinsci.modules.launchd_slave_installer;
 import hudson.Extension;
 import hudson.Util;
 import hudson.remoting.Callable;
+import hudson.remoting.Channel;
 import hudson.slaves.SlaveComputer;
 import org.apache.commons.codec.binary.Base64;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.security.interfaces.RSAPublicKey;
 
 /**
+ * {@link SlaveInstallerFactory} for launchd.
+ *
  * @author Kohsuke Kawaguchi
  */
 @Extension
@@ -23,8 +26,8 @@ public class SlaveInstallerFactoryImpl extends SlaveInstallerFactory {
     InstanceIdentity id;
 
     @Override
-    public SlaveInstaller createIfApplicable(SlaveComputer c) throws IOException, InterruptedException {
-        if (c.getChannel().call(new Predicate())) {
+    public SlaveInstaller createIfApplicable(Channel c) throws IOException, InterruptedException {
+        if (c.call(new Predicate())) {
             RSAPublicKey key = id.getPublic();
             String instanceId = Util.getDigestOf(new String(Base64.encodeBase64(key.getEncoded()))).substring(0,8);
             return new LaunchdSlaveInstaller(instanceId);
