@@ -3,7 +3,8 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.466</version>
+    <version>3.42</version>
+    <relativePath />
   </parent>
 
   <groupId>org.jenkins-ci.modules</groupId>
@@ -16,50 +17,49 @@
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-module.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/${project.artifactId}-module.git</developerConnection>
+    <url>https://github.com/jenkinsci/${project.artifactId}-module</url>
   </scm>
 
   <licenses>
     <license>
       <name>MIT License</name>
-      <url>http://jenkins-ci.org/mit-license</url>
+      <url>https://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
+
+  <properties>
+    <jenkins.version>2.60.3</jenkins.version>
+    <java.level>8</java.level>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>
       <artifactId>slave-installer</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.modules</groupId>
-      <artifactId>instance-identity</artifactId>
-      <version>1.1</version>
+      <version>1.6</version>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jenkins-ci.tools</groupId>
-        <artifactId>maven-hpi-plugin</artifactId>
-        <version>1.90</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+          <groupId>org.jenkins-ci.modules</groupId>
+          <artifactId>instance-identity</artifactId>
+          <version>2.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
+      <url>https://repo.jenkins-ci.org/public/</url>
     </repository>
   </repositories>
 
   <pluginRepositories>
     <pluginRepository>
       <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
+      <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
 </project>
