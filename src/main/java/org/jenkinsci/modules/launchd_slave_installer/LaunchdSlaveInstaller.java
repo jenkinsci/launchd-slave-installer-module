@@ -1,5 +1,6 @@
 package org.jenkinsci.modules.launchd_slave_installer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.FilePath;
 import hudson.util.ArgumentListBuilder;
 import org.apache.commons.io.FileUtils;
@@ -20,6 +21,9 @@ import java.io.InputStream;
  * @author Kohsuke Kawaguchi
  */
 public class LaunchdSlaveInstaller extends AbstractUnixSlaveInstaller {
+
+    private static final long serialVersionUID = 1;
+
     private final String instanceId;
     private transient File tmpDir;
 
@@ -32,11 +36,16 @@ public class LaunchdSlaveInstaller extends AbstractUnixSlaveInstaller {
         return Messages._LaunchdSlaveInstaller_ConfirmationText();
     }
 
+    @SuppressFBWarnings("DM_EXIT")
     @Override
     public void install(LaunchConfiguration params, Prompter prompter) throws InstallationException, IOException, InterruptedException {
         tmpDir = File.createTempFile("jenkins", "tmp");
-        tmpDir.delete();
-        tmpDir.mkdirs();
+        if (!tmpDir.delete()) {
+            throw new IOException();
+        }
+        if (!tmpDir.mkdirs()) {
+            throw new IOException();
+        }
 
         File sudo = copyResourceIntoExecutableFile("cocoasudo");
         File installSh = copyResourceIntoExecutableFile("install.sh");
@@ -66,6 +75,7 @@ public class LaunchdSlaveInstaller extends AbstractUnixSlaveInstaller {
         // let the installation start after we close our connection, to avoid conflicts
         // because this code runs after the channel gets closed, we shouldn't rely on any extra libraries
         Runtime.getRuntime().addShutdownHook(new Thread("service starter") {
+            @Override
             public void run() {
                 try {
                     Process p = new ProcessBuilder(cmds).redirectErrorStream(true).start();
@@ -83,8 +93,7 @@ public class LaunchdSlaveInstaller extends AbstractUnixSlaveInstaller {
 
             private void consume(InputStream in) throws IOException {
                 byte[] buf = new byte[1024];
-                while (in.read(buf)>=0)
-                    ;
+                while (in.read(buf) >= 0) {/* proceed */}
             }
         });
         System.exit(0);
